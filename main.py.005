@@ -1,0 +1,70 @@
+# For running this as a webserver, install package uvicorn, open a console and run
+# venv\Scripts\uvicorn.exe app.main:app --reload
+# main:     The name of the Python file to start
+# app:      The name of the defined FastAPI app
+# --reload: Reload the server automatically when the code changes
+# Documentation: Get with http://localhost:8000/docs
+
+from fastapi import FastAPI
+
+from .database import engine
+from . import models
+
+import mysql.connector
+import time
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=22633s
+# Split up the routes in different FastAPI routers.
+from .routers import post, user, auth
+
+# Setup the database.
+models.Base.metadata.create_all(bind=engine)
+
+# define a FastAPI application.
+app = FastAPI()
+
+while True:
+    try:
+        # Database credentials will be stored in environment later.
+        conn = mysql.connector.connect(host = "multibox",
+                                       database="FastAPICourse",
+                                       user="FastAPICourse",
+                                       password="FastAPICourse")
+        cursor = conn.cursor(dictionary=True)
+        print("Database connection was successful.")
+        break
+    except Exception as error:
+        print("Connecting to database failed.")
+        print("Error: ", error)
+        time.sleep(2)
+
+
+app.include_router(post.router)
+app.include_router(user.router)
+app.include_router(auth.router)
+
+
+@app.get("/")
+def root():
+    return {"message": "Hello World"}   # Will be converted to JSON.
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=27764s
+# Postman features
+#
+#  Environments
+#    Variables to use in requests
+#    Open Environment
+#    Create variables
+#    On workspace select environment (upper right)
+#    Use variables ({{variable}})
+#
+#  Renew tokens in all requests when logging in
+#    When logging in, set an environment variable with the token.
+#    Select Tests tab.
+#    Choose snippet "Set an environment variable".
+#    Use this variable in authentication.
+
+# Query parameters
+# Better: Request parameters
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=31112s
+# Optional parameters with the request for filtering or sorting the result.

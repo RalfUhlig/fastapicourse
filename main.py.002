@@ -1,0 +1,156 @@
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=2181s
+
+# For running this as a webserver, install package uvicorn, open a console and run
+# venv\Scripts\uvicorn.exe app.main:app --reload
+# main:     The name of the Python file to start
+# app:      The name of the defined FastAPI app
+# --reload: Reload the server automatically when the code changes
+
+from fastapi import FastAPI, Response, status, HTTPException
+from fastapi.params import Body
+from pydantic import BaseModel
+from typing import Optional
+from random import randrange
+
+import mysql.connector
+import time
+
+# define a FastAPI application.
+app = FastAPI()
+
+
+# Define a model for a post, based on pydantic.BaseModel.
+# Optional field can be defined with typing.Optional[type].
+class Post(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+
+
+# Connect to database
+# Database: FastAPICourse
+# Server: multibox
+# User: FastAPICourse
+# Password: FastAPICourse
+while True:
+    try:
+        # Database credentials will be stored in environment later.
+        conn = mysql.connector.connect(host = "multibox",
+                                       database="FastAPICourse",
+                                       user="FastAPICourse",
+                                       password="FastAPICourse")
+        cursor = conn.cursor(dictionary=True)
+        print("Database connection was successful.")
+        break
+    except Exception as error:
+        print("Connecting to database failed.")
+        print("Error: ", error)
+        time.sleep(2)
+
+# In-memory storage for posts.
+my_posts = [
+    {"title": "title of post 1", "content": "content of post 1", "id": 1},
+    {"title": "favorite foods", "content": "I like pizza", "id": 2}
+]
+
+
+@app.get("/")
+def root():
+    return {"message": "Hello World"}   # Will be converted to JSON.
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=14880s
+
+@app.get("/posts")
+def get_posts():
+    cursor.execute("""SELECT * FROM posts""")
+    posts = cursor.fetchall()
+    return {"data": posts}
+
+
+# Change the route for creating a post to follow these conventions.
+# A default http status code can be set with the path. Without that, the status code will be 200.
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_posts(post: Post):
+    # %s is a placeholder for a value. So the values a sanitized
+    # and there is less vulnerability for sql injections.
+    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *""",
+                   (post.title, post.content, post.published))
+    new_post = cursor.fetchone()
+    # All changes are state changes and need to be committed to be written to the database.
+    conn.commit()
+
+    return {"data": new_post}
+
+
+# Find a post by its id in the storage.
+def find_post(id):
+    for post in my_posts:
+        if post["id"] == id:
+            return post
+
+
+# Find a post by its id and return the index.
+def find_post_index(id):
+    for index, post in enumerate(my_posts):
+        if post["id"] == id:
+            return index
+
+
+# get the latest post.
+# See note later.
+@app.get("/posts/latest")
+def get_latest_post():
+    post = my_posts[-1]
+    return {"data:": post}
+
+
+# Get one specific post by its id.
+# The id is a path parameter. It will be passed in as type string.
+# FastAPI can convert it in a given type including validation.
+# response is the response object, that can be modified, e.g. setting a status code.
+# Error handling should be done by HTTPException.
+@app.get("/posts/{id}")
+def get_posts(id: int, response: Response):
+    cursor.execute("""SELECT * FROM posts WHERE id = %s""", [id])
+    post = cursor.fetchone()
+
+    if not post:
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {"message": f"post with id {id} was not found."}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} was not found.")
+
+    return {"data": post}
+
+
+# Delete a post.
+# The default status code has to be set again with the response.
+# However, by setting the default status code also here, FastAPI will do some validations,
+# e.g. checking, if the response is empty (has to be with code 204).
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+    cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *""", [id])
+    deleted_post = cursor.fetchone()
+    conn.commit()
+
+    if deleted_post is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} was not found.")
+
+    # Return an empty response but with the right status code.
+    # The default code defines with the path is not used here.
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=7831s
+
+# Update a post
+@app.put("/posts/{id}")
+def update_post(id: int, post: Post):
+    cursor.execute("""UPDATE posts SET title = %s, content = %s, published = %s WHERE ID = %s""",
+                   (post.title, post.content, post.published, id))
+    affected_rows = cursor.rowcount
+    conn.commit()
+
+    if affected_rows == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} was not found.")
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+

@@ -1,0 +1,240 @@
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=2181s
+
+# For running this as a webserver, install package uvicorn, open a console and run
+# venv\Scripts\uvicorn.exe main:app --reload
+# main:     The name of the Python file to start
+# app:      The name of the defined FastAPI app
+# --reload: Reload the server automatically when the code changes
+
+from fastapi import FastAPI, Response, status, HTTPException
+from fastapi.params import Body
+from pydantic import BaseModel
+from typing import Optional
+from random import randrange
+
+
+# define a FastAPI application.
+app = FastAPI()
+
+
+# Set a route for /
+# fastapi path operation are set by a decorator,
+# followed by a function,that will be called.
+# The decorator contains the access method (get) and the url path (/)
+# When handling a request, the first route in order of the code, that matches, will be used.
+# @app.get("/")
+# def root():
+#     return {"message": "Hello World"}   # Will be converted to JSON.
+#
+#
+# @app.get("/posts")
+# def get_posts():
+#     return {"data": "This are your posts."}
+#
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=2363s
+
+# Client                        Server
+# GET ---------------------------->
+#     <----------------------- data
+# POST data ---------------------->
+#      <---------------------- data
+
+# To retrieve the data of a post request, the route function has to have a parameter of the form
+# name: result_type = Body(...)
+# Function Body needs to be imported from fastapi.params.
+# result_type dict: Returns the post data as a Python dictionary.
+# @app.post("/createposts")
+# def create_posts(payload: dict = Body(...)):
+#     print(payload)
+#     return {"new_post": f"title: {payload['title']}, content: {payload['content']}"}
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=3202s
+
+# Issues:
+# * It's a pain to get all the values from the body.
+# * The client can send whatever data they want.
+# * The data isn't getting validated.
+# Result:
+# * We ultimately want to force the clientto send data in a schema that we expect.
+
+# Request has to have:
+# * title, string
+# * content, string
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=4049s
+
+# Define a model for a post, based on pydantic.BaseModel.
+# Optional field can be defined with typing.Optional[type].
+class Post(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+    rating: Optional[int] = None
+
+
+# The parameter of create_posts is now a Post.
+# FastAPI automatically works with pydantic models as schemas,
+# do a validation and parses the data.
+# @app.post("/createposts")
+# def create_posts(post: Post):
+#     print(post)
+#     # Converting the model into a dictionary.
+#     print(post.dict())
+#     return {"new_post":
+#             f"title: {post.title}, "
+#             f"content: {post.content}, "
+#             f"published: {post.published}, "
+#             f"rating: {post.rating}"}
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=4965s
+
+# CRUD Application
+# Create        POST        /posts          @app.post("/posts")         Create a new post.
+# Read          GET         /posts/:id      @app.get("/posts/{id}")     Get the post with the given id.
+#               GET         /posts          @app.get("/posts")          Get all posts.
+# Update        PUT/PATCH   /posts/:id      @app.put("/posts/{id}")     Update the existing post with the given id.
+# Delete        DELETE      /posts/:id      @app.delete("/posts/{id}")  Delete the existing post with the given id.
+#
+# PUT:   Update all fields of a record.
+# PATCH: Update one or more specific fields of a record.
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=5384s
+
+# In-memory storage for posts.
+my_posts = [
+    {"title": "title of post 1", "content": "content of post 1", "id": 1},
+    {"title": "favorite foods", "content": "I like pizza", "id": 2}
+]
+
+
+@app.get("/")
+def root():
+    return {"message": "Hello World"}   # Will be converted to JSON.
+
+
+@app.get("/posts")
+def get_posts():
+    return {"data": my_posts}
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=5646s
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6766s
+
+# Change the route for creating a post to follow these conventions.
+# A default http status code can be set with the path. Without that, the status code will be 200.
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_posts(post: Post):
+    post_dict = post.dict()
+    post_dict["id"] = randrange(0, 1000000)
+    my_posts.append(post_dict)
+    return {"data": post_dict}
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=5987s
+
+# Find a post by its id in the storage.
+def find_post(id):
+    for post in my_posts:
+        if post["id"] == id:
+            return post
+
+
+# Find a post by its id and return the index.
+def find_post_index(id):
+    for index, post in enumerate(my_posts):
+        if post["id"] == id:
+            return index
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6490s
+
+# get the latest post.
+# See note later.
+@app.get("/posts/latest")
+def get_latest_post():
+    post = my_posts[-1]
+    return {"data:": post}
+
+
+# Get one specific post by its id.
+# The id is a path parameter. It will be passed in as type string.
+# FastAPI can convert it in a given type including validation.
+# response is the response object, that can be modified, e.g. setting a status code.
+# Error handling should be done by HTTPException.
+@app.get("/posts/{id}")
+def get_posts(id: int, response: Response):
+    post = find_post(id)
+
+    if not post:
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {"message": f"post with id {id} was not found."}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} was not found.")
+
+    return {"data": post}
+
+
+# Note:
+# If a route like /posts/latest is defined here, it will not work, because it has
+# the same structure as /posts/{id}. So FastAPI will choose the first matching
+# route in order of the definition.
+# Solution: Define routes with fixed paths before routes with variable paths.
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=7309s
+
+# Delete a post.
+# The default status code has to be set again with the response.
+# However, by setting the default status code also here, FastAPI will do some validations,
+# e.g. checking, if the response is empty (has to be with code 204).
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+    # Find the index of the post with the given id.
+    index = find_post_index(id)
+
+    if index is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} was not found.")
+
+    my_posts.pop(index)
+    # Return an empty response but with the right status code.
+    # The default code defines with the path is not used here.
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=7831s
+
+# Update a post
+@app.put("/posts/{id}")
+def update_post(id: int, post: Post):
+    # Find the index of the post with the given id.
+    index = find_post_index(id)
+
+    if index is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id {id} was not found.")
+
+    post_dict = post.dict()
+
+    post_dict['id'] = id
+    my_posts[index] = post_dict
+
+    return {"data": post_dict}
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=8282s
+
+# Documentation is done automatically by swagger or redoc.
+# Swagger: http://127.0.0.1:8000/docs
+# Redoc: http://127.0.0.1:8000/redoc
+
+# Python is working with packages. A package is nothing more than a fancy name
+# for directory. So for making this API a proper Pythin package named app, a
+# directory app has to be created with a dummy file namen __init__.py. That is
+# required by Python for a proper package. The package is then referenced by
+# app.main. So the server has to be started now with
+# venv\Scripts\uvicorn.exe app.main:app --reload
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=8651s
+
+# Databases
+# Database: FastAPICourse
+# Server: multibox
+# User: FastAPICourse
+# Password: FastAPICourse
+
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=14028s
+
