@@ -14,7 +14,7 @@ from .config import settings
 
 # Read it from the settings.
 # https://youtu.be/0sOvCWFmrtA?t=33475
-SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://"\
+SQLALCHEMY_DATABASE_URL = f"{settings.database_connector}://"\
                           f"{settings.database_username}:{settings.database_password}"\
                           f"@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 

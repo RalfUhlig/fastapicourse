@@ -13,7 +13,7 @@ from app.config import settings
 config = context.config
 
 # Override sqlalchemy.url
-config.set_main_option("sqlalchemy.url", f"mysql+mysqlconnector://"\
+config.set_main_option("sqlalchemy.url", f"{settings.database_connector}://"\
                                          f"{settings.database_username}:{settings.database_password}"\
                                          f"@{settings.database_hostname}:{settings.database_port}/{settings.database_name}")
 

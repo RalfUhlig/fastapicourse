@@ -239,4 +239,15 @@ def root():
 #      Install MariaDB as addon: In a console: heroku addons:create jawsdb-maria:kitefin    Credit Card needed!
 #      Install PostGRES as addon: In a console: heroku addons:create heroku-postgresql:hobby-dev
 #      Status of the database can be monitored in the Heroku dashboard.
-
+#      Under the app, database, setting, the credentials can be seen.
+#   Set environment variables
+#   https://www.youtube.com/watch?v=0sOvCWFmrtA&t=42522s
+#      Under the app, settings, reveal config vars, the environment variables can be configured.
+#      The database URL should already be configured.
+#      Set all the needed variables.
+#   Restart the heroku app: In a console: heroku ps:restart
+#   Create database structure
+#   https://www.youtube.com/watch?v=0sOvCWFmrtA&t=43139s
+#      Use the alembic revisions to create the database structure at Heroku.
+#      All alembic revisions are check in, so they are also at Heroku.
+#      In a console: heroku run "alembic upgrade head"

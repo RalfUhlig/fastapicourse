@@ -5,6 +5,7 @@ from pydantic import BaseSettings
 # Class to hold all environment variables.
 # https://youtu.be/0sOvCWFmrtA?t=32740
 class Settings(BaseSettings):
+    database_connector: str
     database_hostname: str
     database_port: int
     database_username: str
