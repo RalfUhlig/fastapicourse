@@ -246,6 +246,7 @@ def root():
 #      The database URL should already be configured.
 #      Set all the needed variables.
 #   Restart the heroku app: In a console: heroku ps:restart
+#   Show the error log: In a console: heroku logs --tail
 #   Create database structure
 #   https://www.youtube.com/watch?v=0sOvCWFmrtA&t=43139s
 #      Use the alembic revisions to create the database structure at Heroku.
