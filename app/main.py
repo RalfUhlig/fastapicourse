@@ -245,6 +245,15 @@ def root():
 #      Under the app, settings, reveal config vars, the environment variables can be configured.
 #      The database URL should already be configured.
 #      Set all the needed variables.
+#         DATABASE_CONNECTOR=postgresql
+#         DATABASE_HOSTNAME=
+#         DATABASE_PORT=
+#         DATABASE_USERNAME=
+#         DATABASE_PASSWORD=
+#         DATABASE_NAME=
+#         SECRET_KEY="xxx"
+#         SIGNING_ALGORITHM=HS256
+#         ACCESS_TOKEN_EXPIRE_MINUTES=60
 #   Restart the heroku app: In a console: heroku ps:restart
 #   Show the error log: In a console: heroku logs --tail
 #   Create database structure
@@ -252,3 +261,5 @@ def root():
 #      Use the alembic revisions to create the database structure at Heroku.
 #      All alembic revisions are check in, so they are also at Heroku.
 #      In a console: heroku run "alembic upgrade head"
+#   Restart the heroku app: In a console: heroku ps:restart
+#   Show the error log: In a console: heroku logs --tail
