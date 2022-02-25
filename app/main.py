@@ -181,6 +181,7 @@ def root():
 #    )
 
 # GIT
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=41018s
 # Preparations
 #   Create file .gitignore and add
 #     __pycache__
@@ -193,11 +194,13 @@ def root():
 #     pip install -r requirements.txt
 #
 # Install git
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=41260s
 #   Download the latest version from https://git.org and install it.
 # Upgrade git to a newer version: In a console:
 #   git update-git-for-windows
 #
-# Create a project on git
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=41363s
+# Create a project on github
 # Create a repository.
 #    git init
 #    git add --all
@@ -209,19 +212,31 @@ def root():
 # Deploying methods
 #
 # Deploying to Heroku
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=41679s
 #   https://heroku.com
 #   Create an account at Heroku: Follow the steps of signing up.
 #   Install Heroku CLI: https://devcenter.heroku.com/articles/getting-started-with-python#set-up
 #   Check the installation: In a console: heroku --version
+#   https://www.youtube.com/watch?v=0sOvCWFmrtA&t=41740s
 #   Create an app: In a console: heroku create fastapicourse
 #     The name ahas to be global unique.
 #     Name must start with a letter, end with a letter or digit and can only contain lowercase letters, digits, and dashes.
 #   Creating a Heroku app also sets up a new git remote: To check, in a console: git remote
 #   Push the app to Heroku: In a console: git push heroku main
+#   Status of the app can be monitored in the Heroku dashboard.
 #   URL for the app at Heroku: https://fastapicourse.herokuapp.com/
+#   Show the error log: In a console: heroku logs --tail
 #   Configure the app at Heroku
+#   https://www.youtube.com/watch?v=0sOvCWFmrtA&t=42021s
 #      Create file named Procfile (exactly like that), with content:
 #         web: uvicorn app.main:app --host=0.0.0.0 --port=${PORT:-5000}
-
-
+#   Add the file to git and push to Heroku. In a console
+#     git add --all
+#     git commit -m "..."
+#     git push heroku main
+#   Add a database
+#   https://www.youtube.com/watch?v=0sOvCWFmrtA&t=42299s
+#      Install MariaDB as addon: In a console: heroku addons:create jawsdb-maria:kitefin    Credit Card needed!
+#      Install PostGRES as addon: In a console: heroku addons:create heroku-postgresql:hobby-dev
+#      Status of the database can be monitored in the Heroku dashboard.
 

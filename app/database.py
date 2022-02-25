@@ -16,7 +16,7 @@ from .config import settings
 # https://youtu.be/0sOvCWFmrtA?t=33475
 SQLALCHEMY_DATABASE_URL = f"mysql+mysqlconnector://"\
                           f"{settings.database_username}:{settings.database_password}"\
-                          f"@{settings.database_hostname}/{settings.database_name}"
+                          f"@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 
 # Define an engine, session class and base class for models.
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

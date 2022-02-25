@@ -6,6 +6,7 @@ from pydantic import BaseSettings
 # https://youtu.be/0sOvCWFmrtA?t=32740
 class Settings(BaseSettings):
     database_hostname: str
+    database_port: int
     database_username: str
     database_password: str
     database_name: str

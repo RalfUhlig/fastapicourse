@@ -15,7 +15,7 @@ config = context.config
 # Override sqlalchemy.url
 config.set_main_option("sqlalchemy.url", f"mysql+mysqlconnector://"\
                                          f"{settings.database_username}:{settings.database_password}"\
-                                         f"@{settings.database_hostname}/{settings.database_name}")
+                                         f"@{settings.database_hostname}:{settings.database_port}/{settings.database_name}")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
