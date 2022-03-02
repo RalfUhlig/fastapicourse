@@ -1,0 +1,14 @@
+[Unit]
+Description=gunicorn instance to FastAPICourse server api
+After=network.target
+
+[Service]
+User=pi
+Group=users
+WorkingDirectory=/home/pi/FastAPICourse/src/
+Environment="PATH=/home/pi/FastAPICourse/venv/bin"
+EnvironmentFile=/home/pi/.env
+ExecStart=/home/pi/FastAPICourse/venv/bin/gunicorn --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 app.main:app
+
+[Install]
+WantedBy=multiuser.target
