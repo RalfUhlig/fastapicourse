@@ -1,0 +1,18 @@
+version: "3"
+services:
+  fastapicourse:
+    build: .
+    ports:
+      - 8000:8000
+#    env_file:
+#      - ./.env
+    environment:
+      - DATABASE_CONNECTOR=mysql+mysqlconnector
+      - DATABASE_HOSTNAME=multibox
+      - DATABASE_PORT=3306
+      - DATABASE_USERNAME=FastAPICourse
+      - DATABASE_PASSWORD=FastAPICourse
+      - DATABASE_NAME=FastAPICourse
+      - SECRET_KEY="7473dndsj843fdndsnds9838732hdsdsnds93732gdsbdskds9"
+      - SIGNING_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60

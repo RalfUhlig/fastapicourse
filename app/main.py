@@ -392,9 +392,82 @@ def root():
 #     Gunicorn can handle HTTPS too, but it is not optimized for that as NGINX is.
 #   Install NGINX: sudo apt install nginx
 #   Start NGINX: sudo systemctl start nginx
+#   Enable automatic restart after reboot: sudo systemctl enable nginx
 #   Configuration of the default page: /etc/nginx/sites-available/default
 #   Copy gunicorn.nginx to /etc/nginx/sites-available/FastAPICourse
 #   Enable the new site: sudo ln -s /etc/nginx/sites-available/FastAPICourse /etc/nginx/sites-enabled/FastAPICourse
 #   Disable the default site: sudo rm /etc/nginx/sites-enabled/default
 #   Restart nginx: sudo systemctl restart nginx
 #   App now available by http://webservicebox
+# Setup a domain name
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=47445s
+#   Only works with a domain name, a dns server and the app setup on a public server.
+# Setup SSL
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=47719s
+#   Lets Encrypt: https://certbot.eff.org/
+#   Get Certbot instructions
+#   Choose software (nginx) and system (debian 10)
+#   Install snapd: sudo apt install snapd
+#   Install the snapd core: sudo snap install core
+#   Update th snapd core to te newest version: sudo snapd refresh core
+#   Install certbot: sudp snap install --classic certbot
+#   Configure nginx for using certbot: sudo certbot --nginx
+#     Email address needed.
+#     Disagree to share the email address.
+#     Enter the domain name(s) the certificate is used for.
+#   Configuration for default website will be changed.
+#   Also a cronjob or a systemd timer is installed for renewing the certificate.
+#     Check /etc/crontab/, /etc/cron.*/*, sudo systemctl list-timers
+#   Test the automatic renewal: sudo certbot renew --dry-run
+# UFW: Uncomplicated Firewall
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&list=RDCMUC8butISFwT-Wl7EV0hUK0BQ&index=1&t=48006s
+#    Install ufw: sudo apt install ufw
+#    Check status: sudo ufw status
+#    Setup firewall rules. The following command create ipv4 as well as an ipv6 rules.
+#    from access from anywhere.
+#      sudo ufw allow http
+#      sudo ufw allow https
+#      sudo ufw allow ssh
+#      # Allow access to prosgres poer 5432. Not recommended.
+#      sudo ufw allow 5432
+#    Activate the filrewall
+#      sudo ufw enable
+#    Remove a rule (e.g. 5432):
+#      sudo ufw delete allow 5432
+#    Deactivate the firewall
+#      sudo ufw disable
+# Pushing code changes to production
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&list=RDCMUC8butISFwT-Wl7EV0hUK0BQ&index=1&t=48227s
+#   # Goto the app directory
+#   cd ~/FastAPICourse/src
+#   # Pull the latest version from git repository.
+#   git pull
+#   # Update all requirements
+#   pip install -r requirements.txt
+#   # Restart the app
+#   sudo systemctl restart FastAPICourse
+#   Best practice: Setup a CI/CD pipeline
+#
+# Deploy on Docker
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=48369s
+#   To create a custom image, start of with a base image for Python and customize it to copy
+#   the source code of the app into it and install all dependencies. That is done with the Dockerfile.
+#   Each command in the Dockerfile is a layer. When creating an image all layers are cached. When
+#   changes are made, unchanged layers are just copied from the cache. This speeds up the update
+#   of an image. So long time taking processes that nearly never changes should be run first.
+#   Build the docker image with the Dockerfile in the current directory (tag has to be lowercase):
+#     docker build -t fastapicourse .
+# Managing docker containers with docker-compose
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=49119s
+#   docker-compose is used to spin up the containers automatically
+#   Configuration: Filke docker-compose.yml
+#   In yml files spacing matters like in Python.
+#   For spinning up a container, a service has to be defined.
+#     image: Image to create a container to start.
+#     build: Builds an image if it does not exist. Parameter is the directory with the Dockerfile.
+#            The created image will be named directory_containername_nr, so here fastapi_fastapicourse_1
+#     ports: List of ports to open. Format: <post on localhost>:<port on container>
+#   Start the configured containers with:
+#     docker-compose up --detach
+#   Stop and remove all configured containers with:
+#     docker-compose down
