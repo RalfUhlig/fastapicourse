@@ -2,17 +2,33 @@ version: "3"
 services:
   fastapicourse:
     build: .
+    depends_on:
+      - postgres
     ports:
       - 8000:8000
 #    env_file:
 #      - ./.env
     environment:
-      - DATABASE_CONNECTOR=mysql+mysqlconnector
-      - DATABASE_HOSTNAME=multibox
-      - DATABASE_PORT=3306
-      - DATABASE_USERNAME=FastAPICourse
-      - DATABASE_PASSWORD=FastAPICourse
+      - DATABASE_CONNECTOR=postgresql
+      - DATABASE_HOSTNAME=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
       - DATABASE_NAME=FastAPICourse
-      - SECRET_KEY="7473dndsj843fdndsnds9838732hdsdsnds93732gdsbdskds9"
+      - SECRET_KEY="7473dndsj843gdndsnds9838732hdsdsnds93732gdsbdskds9"
       - SIGNING_ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=60
+    # There is an issue, that the database schema is not created at fist start.
+    # So running this command one time it works. But that for sure is not good practise.
+    # command: alembic upgrade head
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=FastAPICourse
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:

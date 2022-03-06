@@ -471,3 +471,15 @@ def root():
 #     docker-compose up --detach
 #   Stop and remove all configured containers with:
 #     docker-compose down
+# Create a docker container for postgres
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=49714s
+#   When an aplication is running in docker, it makes sense to run also other components and resources
+#   in docker.
+#   Add a service for postgres in th docker-compose configuration.
+#   To keep the data when the container goes down, a volume is needed to store the data outside
+#   of the container. For the service add a section named volumes ans define a volume name and its
+#   path in the container. Than add a global section named volumes and define for each volume name
+#   used in containers a path at the local machine.
+#   For connections between docker containers, docker creates a network that uses dns. So instead
+#   of an ip address the name of a container can be used.
+#   Dependencies between containers can be defined by "depends_on" with a list of services to start first.
