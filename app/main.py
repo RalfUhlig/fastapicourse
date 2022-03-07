@@ -460,7 +460,7 @@ def root():
 # Managing docker containers with docker-compose
 # https://www.youtube.com/watch?v=0sOvCWFmrtA&t=49119s
 #   docker-compose is used to spin up the containers automatically
-#   Configuration: Filke docker-compose.yml
+#   Configuration: Filke docker-compose-dev.yml
 #   In yml files spacing matters like in Python.
 #   For spinning up a container, a service has to be defined.
 #     image: Image to create a container to start.
@@ -483,3 +483,38 @@ def root():
 #   For connections between docker containers, docker creates a network that uses dns. So instead
 #   of an ip address the name of a container can be used.
 #   Dependencies between containers can be defined by "depends_on" with a list of services to start first.
+# Bind Mounts
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=50182s
+#   A bind mount is a special volume, which allows us to sync a folder on the local machine
+#   with a folder in the container.
+#   local_directory:container_directory:options
+#   options are optional
+#   option ro = read only (content of the folder in the container cannot be changed).
+# Dockerhub
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=50619s
+#   Setup a repository on Dockerhub
+#     Create an account (free)
+#     Create a repository
+#     Choose if it is private or public
+#     Upload an image to Dockerhub:
+#       docker login
+#       docker push <image_name>
+#     The image has to be named exacly as the docker repository (username/repository).
+#     To copy and rename an image: docker image tag <source_image> <target_image>
+# Production vs Development
+# https://www.youtube.com/watch?v=0sOvCWFmrtA&t=50888s
+#   Use different docker-compose files.
+#     Development: docker-compose-dev.yml
+#     Production:  docker-compose-prod.yml
+#   For production
+#     No automatic reload on changes
+#     Port mapping to port 80
+#     Reference the parameters to environment variables (PARAMETER=${VARIABLE})
+#     No bind mount
+#     No building of the image. Instead pull from Dockerhub (replace build by image)
+#   To start the containers with docker-compose:
+#     Dev:  docker-compose -f docker-compose-dev.yml up -d
+#     Prod: docker-compose -f docker-compose-prod.yml up -d
+#   To stop the containers with docker-compose:
+#     Dev:  docker-compose -f docker-compose-dev.yml down
+#     Prod: docker-compose -f docker-compose-prod.yml down

@@ -1,0 +1,37 @@
+version: "3"
+services:
+  fastapicourse:
+    image: fastapicourse
+    depends_on:
+      - postgres
+    ports:
+      - 80:8000
+#    env_file:
+#      - ./.env
+    environment:
+      - DATABASE_CONNECTOR=${DATABASE_CONNECTOR}
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - SIGNING_ALGORITHM=${SIGNING_ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    # Override the default command for the container.
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+    # There is an issue, that the database schema is not created at fist start.
+    # So running this command one time it works. But that for sure is not good practise.
+    # command: alembic upgrade head
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+
+volumes:
+  postgres-db:
